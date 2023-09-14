@@ -31,6 +31,17 @@ public class UserService {
         validateSenderAmount(sender, amount);
     }
 
+    public void updateBalance(Long senderId, Long receiverId, BigDecimal amount) throws Exception {
+        User sender = this.findUserById(senderId);
+        User receiver = this.findUserById(receiverId);
+
+        sender.setBalance(sender.getBalance().subtract(amount));
+        receiver.setBalance(receiver.getBalance().add(amount));
+
+        this.saveUser(sender);
+        this.saveUser(receiver);
+    }
+
     public User findUserById(Long userId) throws Exception {
         return this.repository.findUserById(userId).orElseThrow(() -> new Exception("Usuário não encontrado"));
     }
