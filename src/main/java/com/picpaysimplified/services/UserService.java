@@ -2,17 +2,25 @@ package com.picpaysimplified.services;
 
 import com.picpaysimplified.domain.user.User;
 import com.picpaysimplified.domain.user.UserType;
+import com.picpaysimplified.dtos.UserDTO;
 import com.picpaysimplified.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository repository;
+
+    public User createUser(UserDTO request) {
+        User newUser = new User(request);
+        this.saveUser(newUser);
+        return newUser;
+    }
 
     private void validateSenderTransaction(User sender) throws Exception {
         if(sender.getUserType() == UserType.MERCHANT) {
@@ -40,6 +48,10 @@ public class UserService {
 
         this.saveUser(sender);
         this.saveUser(receiver);
+    }
+
+    public List<User> getAllUsers() {
+        return this.repository.findAll();
     }
 
     public User findUserById(Long userId) throws Exception {

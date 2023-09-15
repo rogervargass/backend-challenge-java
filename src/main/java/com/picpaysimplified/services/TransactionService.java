@@ -18,10 +18,8 @@ import java.util.Map;
 public class TransactionService {
     @Autowired
     private TransactionRepository repository;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private RestTemplate restTemplate;
 
