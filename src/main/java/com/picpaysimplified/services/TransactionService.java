@@ -21,9 +21,11 @@ public class TransactionService {
     @Autowired
     private UserService userService;
     @Autowired
+    private NotificationService notificationService;
+    @Autowired
     private RestTemplate restTemplate;
 
-    public void createTransaction(TransactionDTO transaction) throws Exception {
+    public Transaction createTransaction(TransactionDTO transaction) throws Exception {
         User sender = this.userService.findUserById(transaction.senderId());
         User receiver = this.userService.findUserById(transaction.receiverId());
 
@@ -42,7 +44,12 @@ public class TransactionService {
 
         this.userService.updateBalance(sender.getId(), receiver.getId(), newTransaction.getAmount());
 
-        this.repository.save(newTransaction);
+        saveTransaction(newTransaction);
+
+        this.notificationService.sendNotification(sender, "Transferencia realizada com sucesso");
+        this.notificationService.sendNotification(receiver, "Você recebeu uma transferencia no valor de R$ " + newTransaction.getAmount());
+
+        return newTransaction;
     }
 
     public boolean isAuthorizedTransaction(User sender, BigDecimal value) throws Exception {
@@ -52,5 +59,9 @@ public class TransactionService {
             String message = (String) authorizationResponse.getBody().get("message");
             return "Autorizado".equals(message);
         } else return false;
+    }
+
+    public void saveTransaction(Transaction transaction) {
+        this.repository.save(transaction);
     }
 }
